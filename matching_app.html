@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マッチングアプリ</title>
+    <title>趣味マッチングアプリ</title>
     <style>
         body {
             font-family: 'Helvetica Neue', 'Arial', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
@@ -12,7 +12,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* min-height: 100vh; */
+            min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
@@ -110,7 +110,7 @@
 <body>
 
     <div class="container">
-        <h1>マッチング</h1>
+        <h1>趣味マッチング</h1>
         <p>参加者IDを入力して、相性の良い相手を見つけよう！</p>
         <div class="input-group">
             <input type="text" id="participantId" placeholder="参加者IDを入力">
@@ -120,11 +120,10 @@
     </div>
 
     <script>
-        // === データ取得部分 (JSONP方式) ===
-        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbzOKEHuVKjEni8L7oU-zrformadlMW2DBppcr_Nl-gHOn2Xk21BkmPSHd8z83em6lNRgw/exec';
-        let surveyData = []; // 取得したデータはここに格納
+        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbwH_TvQHngqJm1Vdzox7W9b4OlLPifs4DtGzIAtWhPw68cn9eq0QCMN54RcodqsH5SiAA/exec';
+        let surveyData = [];
 
-        // この関数がAPIから呼び出されて、データを格納します
+        // --- データロード関連 ---
         function loadDataCallback(data) {
             surveyData = data;
             const button = document.getElementById('matchButton');
@@ -133,22 +132,36 @@
             console.log('データの読み込みが完了しました。');
         }
 
-        // ページ読み込み時に、JSONPリクエストを実行
         document.addEventListener('DOMContentLoaded', () => {
+            const button = document.getElementById('matchButton');
+            button.textContent = 'データを読み込み中...';
+            button.disabled = true;
             const script = document.createElement('script');
             script.src = WEB_APP_URL + '?callback=loadDataCallback';
-            
-            // エラーハンドリング
             script.onerror = () => {
                  document.getElementById('result').innerHTML = `<p class="error">データの読み込みに失敗しました。URLやデプロイ設定を確認してください。</p>`;
-                 const button = document.getElementById('matchButton');
                  button.textContent = 'エラー';
             };
-            
             document.body.appendChild(script);
         });
         
-        // === アプリケーションのロジック部分 ===
+        // --- AIによる話題取得関連 ---
+        function getAiTopic(interest) {
+            const callbackName = 'displayAiTopic';
+            const script = document.createElement('script');
+            const encodedInterest = encodeURIComponent(interest);
+            script.src = `${WEB_APP_URL}?callback=${callbackName}&topic=${encodedInterest}`;
+            document.body.appendChild(script);
+        }
+
+        function displayAiTopic(response) {
+            const topicElement = document.querySelector('.topic p');
+            if (topicElement && response.topic) {
+                topicElement.innerHTML = `💡 <b>会話のきっかけ：</b><br>${response.topic}`;
+            }
+        }
+
+        // --- マッチングロジック関連 ---
         const participantIdInput = document.getElementById('participantId');
         const matchButton = document.getElementById('matchButton');
         const resultDiv = document.getElementById('result');
@@ -186,7 +199,35 @@
             }
             displayResult(bestMatch, commonPoints);
         }
+        
+        function displayResult(matchedUser, points) {
+            if (!matchedUser) {
+                resultDiv.innerHTML = `<p class="error">マッチングする相手が見つかりませんでした。</p>`;
+                return;
+            }
 
+            let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
+            let initialTopicHtml = generateTopic(points); // まずは簡易的な話題を生成
+
+            resultDiv.innerHTML = `
+                <div class="result-card">
+                    <h2>こちらの社員と話してみよう！</h2>
+                    <p style="font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;">${matchedUser['氏名']} さん</p>
+                    <p>あなたとの共通点は...</p>
+                    <ul class="common-points">${commonPointsHtml}</ul>
+                    <div class="topic">
+                        <p>💡 <b>会話のきっかけ：</b><br>${initialTopicHtml}</p>
+                    </div>
+                </div>
+            `;
+
+            // 共通点があれば、AIにさらに面白い話題を聞きに行く
+            if (points.length > 0) {
+                const primaryInterest = points[0].point;
+                getAiTopic(primaryInterest);
+            }
+        }
+        
         function calculateScore(user1, user2) {
             let score = 0;
             const points = [];
@@ -212,28 +253,6 @@
             return { score, points };
         }
 
-        function displayResult(matchedUser, points) {
-            if (!matchedUser) {
-                resultDiv.innerHTML = `<p class="error">マッチングする相手が見つかりませんでした。</p>`;
-                return;
-            }
-
-            let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
-            let topicHtml = generateTopic(points);
-
-            resultDiv.innerHTML = `
-                <div class="result-card">
-                    <h2>こちらの社員と話してみよう！</h2>
-                    <p style="font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;">${matchedUser['氏名']} さん</p>
-                    <p>あなたとの共通点は...</p>
-                    <ul class="common-points">${commonPointsHtml}</ul>
-                    <div class="topic">
-                        <p>💡 <b>会話のきっかけ：</b><br>${topicHtml}</p>
-                    </div>
-                </div>
-            `;
-        }
-        
         function generateTopic(points) {
             if (points.length === 0) {
                 return "まずは気軽に挨拶から始めてみましょう！";
