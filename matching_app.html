@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>趣味マッチングアプリ</title>
+    <title>マッチングアプリ</title>
     <style>
         body {
             font-family: 'Helvetica Neue', 'Arial', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
@@ -110,7 +110,7 @@
 <body>
 
     <div class="container">
-        <h1>趣味マッチング</h1>
+        <h1>マッチング</h1>
         <p>参加者IDを入力して、相性の良い相手を見つけよう！</p>
         <div class="input-group">
             <input type="text" id="participantId" placeholder="参加者IDを入力">
@@ -207,8 +207,6 @@
             }
 
             let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
-
-            // --- ★★★ ここからが修正箇所 ★★★ ---
 
             // 優先する話題を決定するための変数を準備
             let prioritizedInterest = null;
