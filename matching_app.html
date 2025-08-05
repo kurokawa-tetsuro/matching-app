@@ -208,12 +208,16 @@
 
             let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
 
+            // --- ★★★ ここからが修正箇所 ★★★ ---
+
             // 優先する話題を決定するための変数を準備
             let prioritizedInterest = null;
-            const businessFieldHeader = '興味のあるビジネス分野';
+            // 正しいヘッダー名（末尾の空白も含む）で検索するように修正
+            const businessFieldHeader = '興味のあるビジネス分野  ';
 
             // 共通点リスト(points)の中から「興味のあるビジネス分野」の共通点を探す
-            const businessPoint = points.find(p => p.field === businessFieldHeader);
+            // p.field と businessFieldHeader を比較
+            const businessPoint = points.find(p => p.field.trim() === businessFieldHeader.trim());
 
             if (businessPoint) {
                 // もしビジネス分野の共通点が見つかれば、それを最優先の話題にする
@@ -224,7 +228,7 @@
             }
             
             // ひとまず簡易的な話題で表示を初期化
-            let initialTopicHtml = generateTopic(points); 
+            let initialTopicHtml = generateTopic(prioritizedInterest, points); 
 
             resultDiv.innerHTML = `
                 <div class="result-card">
