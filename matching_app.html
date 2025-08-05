@@ -207,7 +207,24 @@
             }
 
             let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
-            let initialTopicHtml = generateTopic(points); // まずは簡易的な話題を生成
+
+            // 優先する話題を決定するための変数を準備
+            let prioritizedInterest = null;
+            const businessFieldHeader = '興味のあるビジネス分野  ';
+
+            // 共通点リスト(points)の中から「興味のあるビジネス分野」の共通点を探す
+            const businessPoint = points.find(p => p.field === businessFieldHeader);
+
+            if (businessPoint) {
+                // もしビジネス分野の共通点が見つかれば、それを最優先の話題にする
+                prioritizedInterest = businessPoint.point;
+            } else if (points.length > 0) {
+                // 見つからなければ、これまで通りリストの最初の共通点を話題にする
+                prioritizedInterest = points[0].point;
+            }
+            
+            // ひとまず簡易的な話題で表示を初期化
+            let initialTopicHtml = generateTopic(points); 
 
             resultDiv.innerHTML = `
                 <div class="result-card">
@@ -221,10 +238,9 @@
                 </div>
             `;
 
-            // 共通点があれば、AIにさらに面白い話題を聞きに行く
-            if (points.length > 0) {
-                const primaryInterest = points[0].point;
-                getAiTopic(primaryInterest);
+            // AIに、決定した優先トピックで、より面白い話題生成を依頼する
+            if (prioritizedInterest) {
+                getAiTopic(prioritizedInterest);
             }
         }
         
