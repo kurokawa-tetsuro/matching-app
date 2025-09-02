@@ -40,7 +40,7 @@
     <script>
         /**
          * @fileoverview 趣味マッチングアプリのフロントエンドスクリプト。
-         * @version 3.0.0
+         * @version 3.1.0
          */
 
         // ▼▼▼ 設定項目 ▼▼▼
@@ -136,13 +136,12 @@
             matches.forEach((match, index) => {
                 let commonPointsHtml = match.points.map(p => `<li>「${p.point}」</li>`).join('');
                 
-                // ★★★ 優先順位ロジックを削除し、単純化 ★★★
                 let prioritizedInterest = null;
                 if (match.points.length > 0) {
-                    // 単純にリストの最初の共通点を話題にする
                     prioritizedInterest = match.points[0].point;
                 }
 
+                // ★★★ 修正点：まず「生成中」と表示する ★★★
                 const cardHtml = `
                     <div class="result-card">
                         <h2>候補者 #${index + 1}</h2>
@@ -150,14 +149,19 @@
                         <p>あなたとの共通点は...</p>
                         <ul class="common-points">${commonPointsHtml}</ul>
                         <div class="topic" id="topic-${index}">
-                            <p>💡 <b>会話のきっかけ：</b><br>AIが話題を生成中...</p>
+                            <p>💡 <b>会話のきっかけ：</b><br>AIが最適な話題を生成中です...</p>
                         </div>
                     </div>
                 `;
                 resultDiv.innerHTML += cardHtml;
 
+                // ★★★ 修正点：AI呼び出しのロジックをここに集約 ★★★
                 if (prioritizedInterest) {
                     getAiTopic(prioritizedInterest, index);
+                } else {
+                    // 共通点がない場合はAIを呼ばず、デフォルトメッセージを表示
+                    const topicElement = document.querySelector(`#topic-${index} p`);
+                    topicElement.innerHTML = `💡 <b>会話のきっかけ：</b><br>まずは気軽に挨拶から始めてみましょう！`;
                 }
             });
         }
@@ -165,8 +169,6 @@
         function calculateScore(user1, user2) {
             let score = 0;
             const points = [];
-            // ★★★ 設問リストを新しいものに更新 ★★★
-            // 重要：ここの文字列は、スプレッドシートの列名と完全に一致させる必要があります。
             const fieldsToCompare = [
                 '好きな麺類は？',
                 '好きな動物は？',
@@ -185,38 +187,8 @@
             }
             return { score, points };
         }
-
-        // ★★★ 簡易的な話題生成も新しい設問に合わせて更新 ★★★
-        function generateTopic(points) {
-            if (!points || points.length === 0) {
-                return "まずは気軽に挨拶から始めてみましょう！";
-            }
-            
-            const firstPoint = points[0];
-            const interest = firstPoint.point;
-            let topic = "";
-
-            switch (firstPoint.field) {
-                case '好きな麺類は？':
-                    topic = `お二人とも「${interest}」がお好きなんですね！最近食べた美味しいお店はありますか？`;
-                    break;
-                case '好きな動物は？':
-                    topic = `「${interest}」がお好きなんですね！何かペットを飼っていたり、動物の面白い動画を見たりしますか？`;
-                    break;
-                case '好きなコンビニは？':
-                    topic = `よく行くコンビニが「${interest}」で同じなんですね！つい買ってしまう定番の商品とかありますか？`;
-                    break;
-                case '今週末に行くならどこ？':
-                    topic = `お二人とも「${interest}」に行くのがお好きなんですね！最近行って楽しかった場所などありますか？`;
-                    break;
-                case '「よく読んでた」または、「よく読む」マンガ雑誌は？':
-                    topic = `「${interest}」を読まれていた（いる）んですね！一番好きだった漫画や、印象に残っている作品について話してみてはいかがでしょう？`;
-                    break;
-                default:
-                    topic = `「${interest}」という共通点があるようです。ぜひお話ししてみてください！`;
-            }
-            return topic;
-        }
+        
+        // ★★★ 修正点：簡易的な話題生成を行う `generateTopic` 関数は不要になったため削除 ★★★
     </script>
 </body>
 </html>
