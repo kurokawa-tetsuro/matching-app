@@ -44,7 +44,7 @@
          */
 
         // ▼▼▼ 設定項目 ▼▼▼
-        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbxqpTVNXvYB5iiV7dyQEsNrHsgDmh_gzKlOkZI-TPEjnV4kLVQdLiqOyNf_UPxk_bLi/exec';
+        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbziBHWg8aQxYPhMeJU5vPLJuCSS2IsWBBybaVoNPaVSqNitgKhumdcugzOvOtRY_RQq8g/exec';
         let surveyData = [];
 
         // --- データロード & ドロップダウン生成 ---
@@ -136,12 +136,12 @@
             matches.forEach((match, index) => {
                 let commonPointsHtml = match.points.map(p => `<li>「${p.point}」</li>`).join('');
                 
-                let prioritizedInterest = null;
+                // ★★★ 変更点：回答(point)だけでなく、質問(field)も保持する ★★★
+                let prioritizedPointObject = null;
                 if (match.points.length > 0) {
-                    prioritizedInterest = match.points[0].point;
+                    prioritizedPointObject = match.points[0];
                 }
 
-                // ★★★ 修正点：まず「生成中」と表示する ★★★
                 const cardHtml = `
                     <div class="result-card">
                         <h2>候補者 #${index + 1}</h2>
@@ -155,15 +155,24 @@
                 `;
                 resultDiv.innerHTML += cardHtml;
 
-                // ★★★ 修正点：AI呼び出しのロジックをここに集約 ★★★
-                if (prioritizedInterest) {
-                    getAiTopic(prioritizedInterest, index);
+                if (prioritizedPointObject) {
+                    // ★★★ 変更点：AIに質問(field)と回答(point)の両方を渡す ★★★
+                    getAiTopic(prioritizedPointObject.field, prioritizedPointObject.point, index);
                 } else {
-                    // 共通点がない場合はAIを呼ばず、デフォルトメッセージを表示
                     const topicElement = document.querySelector(`#topic-${index} p`);
                     topicElement.innerHTML = `💡 <b>会話のきっかけ：</b><br>まずは気軽に挨拶から始めてみましょう！`;
                 }
             });
+        }
+
+        // ★★★ 変更点：questionとanswerの2つを送るように修正 ★★★
+        function getAiTopic(question, answer, index) {
+            const callbackName = 'displayAiTopic';
+            const script = document.createElement('script');
+            const encodedQuestion = encodeURIComponent(question);
+            const encodedAnswer = encodeURIComponent(answer);
+            script.src = `${WEB_APP_URL}?callback=${callbackName}&question=${encodedQuestion}&answer=${encodedAnswer}&index=${index}`;
+            document.body.appendChild(script);
         }
         
         function calculateScore(user1, user2) {
