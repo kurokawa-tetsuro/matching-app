@@ -3,249 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マッチングアプリ</title>
+    <title>趣味マッチングアプリ</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', 'Arial', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-        h1 {
-            font-size: 1.8em;
-            color: #2c3e50;
-            margin-bottom: 25px;
-        }
-        p {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        #participantId {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            font-size: 1em;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        #matchButton {
-            width: 100%;
-            padding: 14px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        #matchButton:hover {
-            background-color: #2980b9;
-        }
-        #matchButton:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-        }
-        #result {
-            margin-top: 30px;
-            text-align: left;
-            border-top: 1px solid #ecf0f1;
-            padding-top: 20px;
-        }
-        .result-card {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        .result-card h2 {
-            margin-top: 0;
-            font-size: 1.4em;
-            color: #3498db;
-        }
-        .result-card p {
-            color: #34495e;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-        .result-card .common-points {
-            font-weight: bold;
-            color: #e67e22;
-        }
-         .result-card .topic {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #e8f4fd;
-            border-left: 4px solid #3498db;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-        }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { width: 100%; max-width: 600px; background-color: #fff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); text-align: center; }
+        h1 { font-size: 1.8em; color: #2c3e50; margin-bottom: 25px; }
+        p { color: #7f8c8d; margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        #nameDropdown { width: 100%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 8px; font-size: 1em; box-sizing: border-box; }
+        #matchButton { width: 100%; padding: 14px; background-color: #3498db; color: #fff; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s; }
+        #matchButton:hover { background-color: #2980b9; }
+        #matchButton:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #result { margin-top: 30px; text-align: left; }
+        .result-card { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 20px; animation: fadeIn 0.5s ease-in-out; }
+        .result-card h2 { margin-top: 0; font-size: 1.4em; color: #3498db; }
+        .result-card p { color: #34495e; margin-bottom: 10px; line-height: 1.6; }
+        .result-card .common-points { font-weight: bold; color: #e67e22; }
+        .result-card .topic { margin-top: 15px; padding: 15px; background-color: #e8f4fd; border-left: 4px solid #3498db; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .error { color: #e74c3c; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>マッチング</h1>
-        <p>参加者IDを入力して、相性の良い相手を見つけよう！</p>
+        <h1>趣味マッチング</h1>
+        <p>自分の名前を選択して、相性の良い相手を見つけよう！</p>
         <div class="input-group">
-            <input type="text" id="participantId" placeholder="参加者IDを入力">
+            <select id="nameDropdown" disabled>
+                <option value="">（データを読み込み中...）</option>
+            </select>
         </div>
-        <button id="matchButton" disabled>データを読み込み中...</button>
+        <button id="matchButton" disabled>マッチング！</button>
         <div id="result"></div>
     </div>
 
     <script>
-        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbzvjEkRtSfbw21xCi9YmOVCzXXJtF9J9kVh5AhWZsk1H-IKQa4K0hHrL4KfAW3BYMivlg/exec';
+        /**
+         * @fileoverview 趣味マッチングアプリのフロントエンドスクリプト。
+         * GAS Webアプリからデータを取得し、マッチング処理と結果表示を行う。
+         * @version 2.0.0
+         */
+
+        // ▼▼▼ 設定項目 ▼▼▼
+        const WEB_APP_URL = 'https://script.google.com/a/macros/kcgrp.jp/s/AKfycbw3UNtnWDFuj9O1kSxiNG4F45JJYqSA8cyqdmh0m5r-AAfLEHVjkS_rQz7vq0WkmlmfuQ/exec';
         let surveyData = [];
 
-        // --- データロード関連 ---
+        // --- データロード & ドロップダウン生成 ---
+
+        /**
+         * GASから取得した全データをグローバル変数に格納し、ドロップダウンを生成するコールバック関数。
+         * @param {Array<Object>} data スプレッドシートの全データを含むオブジェクトの配列。
+         */
         function loadDataCallback(data) {
             surveyData = data;
+            populateDropdown(data);
             const button = document.getElementById('matchButton');
             button.disabled = false;
-            button.textContent = 'マッチング！';
             console.log('データの読み込みが完了しました。');
         }
 
+        /**
+         * 参加者の氏名リストから、HTMLのプルダウンメニューを動的に生成する。
+         * @param {Array<Object>} data スプレッドシートの全データ。
+         */
+        function populateDropdown(data) {
+            const dropdown = document.getElementById('nameDropdown');
+            dropdown.innerHTML = '<option value="">自分の名前を選択してください</option>'; // 初期化
+            const names = data.map(user => user['氏名']).sort();
+            names.forEach(name => {
+                if (name) { // 空の名前は除外
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    dropdown.appendChild(option);
+                }
+            });
+            dropdown.disabled = false;
+        }
+
+        /**
+         * ページ読み込み完了時に、GAS WebアプリにJSONPリクエストを送信して全データを取得する。
+         */
         document.addEventListener('DOMContentLoaded', () => {
-            const button = document.getElementById('matchButton');
-            button.textContent = 'データを読み込み中...';
-            button.disabled = true;
             const script = document.createElement('script');
             script.src = WEB_APP_URL + '?callback=loadDataCallback';
             script.onerror = () => {
-                 document.getElementById('result').innerHTML = `<p class="error">データの読み込みに失敗しました。URLやデプロイ設定を確認してください。</p>`;
-                 button.textContent = 'エラー';
+                document.getElementById('nameDropdown').innerHTML = '<option value="">エラー</option>';
             };
             document.body.appendChild(script);
         });
         
-        // --- AIによる話題取得関連 ---
-        function getAiTopic(interest) {
+        // --- AIによる話題取得 ---
+
+        /**
+         * GASにAIによる話題生成をリクエストする。
+         * @param {string} interest 共通の興味・関心。
+         * @param {number} index 結果を表示するカードのインデックス（0, 1, 2）。
+         */
+        function getAiTopic(interest, index) {
             const callbackName = 'displayAiTopic';
             const script = document.createElement('script');
             const encodedInterest = encodeURIComponent(interest);
-            script.src = `${WEB_APP_URL}?callback=${callbackName}&topic=${encodedInterest}`;
+            script.src = `${WEB_APP_URL}?callback=${callbackName}&topic=${encodedInterest}&index=${index}`;
             document.body.appendChild(script);
         }
 
+        /**
+         * AIが生成した話題を、対応する結果カードに表示するコールバック関数。
+         * @param {Object} response GASから返されるオブジェクト。{ topic: string, index: string } 形式。
+         */
         function displayAiTopic(response) {
-            const topicElement = document.querySelector('.topic p');
+            const topicElement = document.querySelector(`#topic-${response.index} p`);
             if (topicElement && response.topic) {
                 topicElement.innerHTML = `💡 <b>会話のきっかけ：</b><br>${response.topic}`;
             }
         }
 
-        // --- マッチングロジック関連 ---
-        const participantIdInput = document.getElementById('participantId');
+        // --- マッチングロジック ---
+        const nameDropdown = document.getElementById('nameDropdown');
         const matchButton = document.getElementById('matchButton');
         const resultDiv = document.getElementById('result');
 
-        matchButton.addEventListener('click', findMatch);
+        matchButton.addEventListener('click', findMatches);
 
-        function findMatch() {
-            const inputId = participantIdInput.value.trim();
-            if (!inputId) {
-                resultDiv.innerHTML = `<p class="error">参加者IDを入力してください。</p>`;
+        /**
+         * 「マッチング！」ボタンが押されたときに実行されるメイン関数。
+         * 上位3名の候補者を探し出し、結果表示関数を呼び出す。
+         */
+        function findMatches() {
+            const selectedName = nameDropdown.value;
+            if (!selectedName) {
+                resultDiv.innerHTML = `<p class="error">自分の名前を選択してください。</p>`;
                 return;
             }
-
-            const currentUser = surveyData.find(user => String(user['参加者ID']).trim() === inputId);
-
+            const currentUser = surveyData.find(user => user['氏名'] === selectedName);
             if (!currentUser) {
-                resultDiv.innerHTML = `<p class="error">入力された参加者IDが見つかりません。</p>`;
+                resultDiv.innerHTML = `<p class="error">選択されたユーザーが見つかりません。</p>`;
                 return;
             }
-
-            let bestMatch = null;
-            let maxScore = -1;
-            let commonPoints = [];
-
+            let allMatches = [];
             for (const otherUser of surveyData) {
-                if (String(otherUser['参加者ID']).trim() === String(currentUser['参加者ID']).trim()) {
-                    continue;
-                }
+                if (otherUser['氏名'] === currentUser['氏名']) continue;
                 const { score, points } = calculateScore(currentUser, otherUser);
-                if (score > maxScore) {
-                    maxScore = score;
-                    bestMatch = otherUser;
-                    commonPoints = points;
+                if (score > 0) {
+                    allMatches.push({ user: otherUser, score: score, points: points });
                 }
             }
-            displayResult(bestMatch, commonPoints);
+            allMatches.sort((a, b) => b.score - a.score);
+            const top3Matches = allMatches.slice(0, 3);
+            displayResults(top3Matches);
         }
         
-        function displayResult(matchedUser, points) {
-            if (!matchedUser) {
-                resultDiv.innerHTML = `<p class="error">マッチングする相手が見つかりませんでした。</p>`;
+        /**
+         * マッチング結果（上位3名）を受け取り、画面に表示する。
+         * @param {Array<Object>} matches 上位3名のマッチング相手の情報を含む配列。
+         */
+        function displayResults(matches) {
+            resultDiv.innerHTML = ''; // 結果をクリア
+            if (matches.length === 0) {
+                resultDiv.innerHTML = `<p>残念ながら、共通点のある相手が見つかりませんでした。</p>`;
                 return;
             }
-
-            let commonPointsHtml = points.map(p => `<li>「${p.point}」</li>`).join('');
-
-            // 優先する話題を決定するための変数を準備
-            let prioritizedInterest = null;
-            // 正しいヘッダー名（末尾の空白も含む）で検索するように修正
-            const businessFieldHeader = '興味のあるビジネス分野  ';
-
-            // 共通点リスト(points)の中から「興味のあるビジネス分野」の共通点を探す
-            // p.field と businessFieldHeader を比較
-            const businessPoint = points.find(p => p.field.trim() === businessFieldHeader.trim());
-
-            if (businessPoint) {
-                // もしビジネス分野の共通点が見つかれば、それを最優先の話題にする
-                prioritizedInterest = businessPoint.point;
-            } else if (points.length > 0) {
-                // 見つからなければ、これまで通りリストの最初の共通点を話題にする
-                prioritizedInterest = points[0].point;
-            }
-            
-            // ひとまず簡易的な話題で表示を初期化
-            let initialTopicHtml = generateTopic(prioritizedInterest, points); 
-
-            resultDiv.innerHTML = `
-                <div class="result-card">
-                    <h2>こちらの社員と話してみよう！</h2>
-                    <p style="font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;">${matchedUser['氏名']} さん</p>
-                    <p>あなたとの共通点は...</p>
-                    <ul class="common-points">${commonPointsHtml}</ul>
-                    <div class="topic">
-                        <p>💡 <b>会話のきっかけ：</b><br>${initialTopicHtml}</p>
+            matches.forEach((match, index) => {
+                let commonPointsHtml = match.points.map(p => `<li>「${p.point}」</li>`).join('');
+                let prioritizedInterest = null;
+                const businessFieldHeader = '興味のあるビジネス分野';
+                const businessPoint = match.points.find(p => p.field === businessFieldHeader);
+                if (businessPoint) {
+                    prioritizedInterest = businessPoint.point;
+                } else if (match.points.length > 0) {
+                    prioritizedInterest = match.points[0].point;
+                }
+                const cardHtml = `
+                    <div class="result-card">
+                        <h2>候補者 #${index + 1}</h2>
+                        <p style="font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;">${match.user['氏名']} さん</p>
+                        <p>あなたとの共通点は...</p>
+                        <ul class="common-points">${commonPointsHtml}</ul>
+                        <div class="topic" id="topic-${index}">
+                            <p>💡 <b>会話のきっかけ：</b><br>AIが話題を生成中...</p>
+                        </div>
                     </div>
-                </div>
-            `;
-
-            // AIに、決定した優先トピックで、より面白い話題生成を依頼する
-            if (prioritizedInterest) {
-                getAiTopic(prioritizedInterest);
-            }
+                `;
+                resultDiv.innerHTML += cardHtml;
+                if (prioritizedInterest) {
+                    getAiTopic(prioritizedInterest, index);
+                }
+            });
         }
         
+        /**
+         * 二人のユーザーのアンケート回答を比較し、共通点のスコアと内容を計算する。
+         * @param {Object} user1 比較するユーザー1のデータ。
+         * @param {Object} user2 比較するユーザー2のデータ。
+         * @returns {{score: number, points: Array<Object>}} 計算されたスコアと共通点の内容。
+         */
         function calculateScore(user1, user2) {
             let score = 0;
             const points = [];
@@ -256,50 +208,16 @@
                 '休日の過ごし方について  ',
                 '興味のあるビジネス分野  '
             ];
-
             for (const field of fieldsToCompare) {
                 const user1Answers = user1[field] ? String(user1[field]).split(',').map(item => item.trim()) : [];
                 const user2Answers = user2[field] ? String(user2[field]).split(',').map(item => item.trim()) : [];
-                
                 const intersection = user1Answers.filter(answer => answer && user2Answers.includes(answer));
-                
                 if (intersection.length > 0) {
                     score += intersection.length;
                     intersection.forEach(point => points.push({ field: field.trim(), point }));
                 }
             }
             return { score, points };
-        }
-
-        function generateTopic(points) {
-            if (points.length === 0) {
-                return "まずは気軽に挨拶から始めてみましょう！";
-            }
-
-            const firstPoint = points[0];
-            const interest = firstPoint.point;
-            let topic = "";
-
-            switch (firstPoint.field) {
-                case '好きな食べ物のジャンルは？':
-                    topic = `お二人とも「${interest}」がお好きなんですね！最近食べた美味しいお店や、おすすめのメニューはありますか？`;
-                    break;
-                case 'エンタメの好み（音楽）について':
-                    topic = `音楽の好みが合いますね！「${interest}」系のアーティストで、最近注目している人はいますか？`;
-                    break;
-                case 'エンタメの好み（映像）について':
-                    topic = `「${interest}」系の作品がお好きなんですね！人生で一番ハマった作品や、最近観て面白かったものをぜひ教え合ってみてください。`;
-                    break;
-                 case '休日の過ごし方について':
-                    topic = `休日の過ごし方が似ていますね！「${interest}」以外に、最近ハマっていることはありますか？`;
-                    break;
-                case '興味のあるビジネス分野':
-                    topic = `「${interest}」という分野に興味があるんですね！この分野について、最近気になったニュースや、挑戦してみたいことはありますか？`;
-                    break;
-                default:
-                    topic = `「${interest}」という共通点があるようです。ぜひお話ししてみてください！`;
-            }
-            return topic;
         }
     </script>
 </body>
