@@ -126,7 +126,7 @@
             displayResults(top3Matches);
         }
         
-        function displayResults(matches) {
+function displayResults(matches) {
             resultDiv.innerHTML = '';
             if (matches.length === 0) {
                 resultDiv.innerHTML = `<p>残念ながら、共通点のある相手が見つかりませんでした。</p>`;
@@ -136,10 +136,13 @@
             matches.forEach((match, index) => {
                 let commonPointsHtml = match.points.map(p => `<li>「${p.point}」</li>`).join('');
                 
-                // ★★★ 変更点：回答(point)だけでなく、質問(field)も保持する ★★★
-                let prioritizedPointObject = null;
+                // --- ★★★ ここからが修正箇所 ★★★ ---
+                
+                let randomPointObject = null;
                 if (match.points.length > 0) {
-                    prioritizedPointObject = match.points[0];
+                    // 共通点のリストの中から、ランダムに1つを選ぶ
+                    const randomIndex = Math.floor(Math.random() * match.points.length);
+                    randomPointObject = match.points[randomIndex];
                 }
 
                 const cardHtml = `
@@ -155,13 +158,15 @@
                 `;
                 resultDiv.innerHTML += cardHtml;
 
-                if (prioritizedPointObject) {
-                    // ★★★ 変更点：AIに質問(field)と回答(point)の両方を渡す ★★★
-                    getAiTopic(prioritizedPointObject.field, prioritizedPointObject.point, index);
+                if (randomPointObject) {
+                    // ランダムに選ばれた共通点（質問と回答）をAIに渡す
+                    getAiTopic(randomPointObject.field, randomPointObject.point, index);
                 } else {
                     const topicElement = document.querySelector(`#topic-${index} p`);
                     topicElement.innerHTML = `💡 <b>会話のきっかけ：</b><br>まずは気軽に挨拶から始めてみましょう！`;
                 }
+                
+                // --- ★★★ 修正箇所はここまで ★★★ ---
             });
         }
 
